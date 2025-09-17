@@ -1,0 +1,54 @@
+public class Fraction implements Comparable<Fraction>
+{
+    private final long top;     // numerator
+    private final long bottom;  // denominator
+
+    public Fraction(long numerator, long denominator) {
+        if (denominator == 0) throw new IllegalArgumentException("Denominator cannot be zero");
+
+        if (denominator < 0) {
+            numerator = -numerator;
+            denominator = -denominator;
+        }
+
+        long gcd = gcd(Math.abs(numerator), denominator);
+        this.top = numerator / gcd;
+        this.bottom = denominator / gcd;
+    }
+
+    // 最大公约数
+    private long gcd(long a, long b) {
+        while (b != 0) {
+            long t = b;
+            b = a % b;
+            a = t;
+        }
+        return a;
+    }
+
+    @Override
+    public int hashCode() { 
+        return 17 * Long.hashCode(top) + Long.hashCode(bottom); 
+    }
+
+    @Override
+    public boolean equals(Object o) { 
+        return compareTo((Fraction)o) == 0; 
+    }
+
+    @Override
+    public int compareTo(Fraction f2) { 
+        return Long.compare(top * f2.bottom, f2.top * bottom); 
+    }
+
+    public Fraction add(Fraction f2) {
+        long newTop = this.top * f2.bottom + f2.top * this.bottom;
+        long newBottom = this.bottom * f2.bottom;
+        return new Fraction(newTop, newBottom); // 会自动约分
+    }
+
+    @Override
+    public String toString() {
+        return top + "/" + bottom;
+    }
+}

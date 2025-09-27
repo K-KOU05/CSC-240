@@ -1,0 +1,105 @@
+public class PolicyTest {
+    public static void main(String[] args) {
+        Auto a = new Auto("Jerry", "Seinfed", "Chevy", "Malibu", 10000.0, 50000.0);
+        a.computeCommission();
+        System.out.println(a);
+
+        Home h = new Home();
+        h.setFirstName("Elaine");
+        h.setLastName("Benes");
+        h.setFootage(4000);
+        h.setDwelling(32000);
+        h.setContents(5000);
+        h.setLiability(10000);
+        h.computeCommission();
+        System.out.println(h);
+
+        Life l = new Life("Cosmo", "Kramer", 35, 50000);
+        l.computeCommission();
+        System.out.println(l);
+
+        System.out.println("Get life firstName: " + l.getFirstName());
+        System.out.println("Get life lastName: " + l.getLastName());
+        System.out.println("Get life age: " + l.getAge());
+        System.out.println("Get life term: " + l.getTerm());
+    }
+}
+
+class Auto {
+    private String firstName, lastName, make, model;
+    private double liability, collision, commission;
+
+    public Auto(String firstName, String lastName, String make, String model, double liability, double collision) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.make = make;
+        this.model = model;
+        this.liability = liability;
+        this.collision = collision;
+    }
+
+    public void computeCommission() {
+        commission = (liability + collision) * 0.30;
+    }
+
+    public String toString() {
+        return "Auto Policy\n-----------" +
+               "\nName: " + firstName + " " + lastName +
+               "\nMake: " + make +
+               "\nModel: " + model +
+               String.format("\nLiability: $%,.2f\nCollision: $%,.2f\nCommission: $%,.2f\n", liability, collision, commission);
+    }
+}
+
+class Home {
+    private String firstName, lastName;
+    private int footage;
+    private double dwelling, contents, liability, commission;
+
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setFootage(int footage) { this.footage = footage; }
+    public void setDwelling(double dwelling) { this.dwelling = dwelling; }
+    public void setContents(double contents) { this.contents = contents; }
+    public void setLiability(double liability) { this.liability = liability; }
+
+    public void computeCommission() {
+        commission = (liability * 0.30) + ((dwelling + contents) * 0.20);
+    }
+
+    public String toString() {
+        return "Home Policy\n-----------" +
+               "\nName: " + firstName + " " + lastName +
+               "\nFootage: " + footage +
+               String.format("\nDwelling: $%,.2f\nContents: $%,.2f\nLiability: $%,.2f\nCommission: $%,.2f\n", dwelling, contents, liability, commission);
+    }
+}
+
+class Life {
+    private String firstName, lastName;
+    private int age;
+    private double term, commission;
+
+    public Life(String firstName, String lastName, int age, double term) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.term = term;
+    }
+
+    public void computeCommission() {
+        commission = term * 0.20;
+    }
+
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public int getAge() { return age; }
+    public double getTerm() { return term; }
+
+    public String toString() {
+        return "Life Policy\n-----------" +
+               "\nName: " + firstName + " " + lastName +
+               "\nAge: " + age +
+               String.format("\nTerm: $%,.2f\nCommission: $%,.2f\n", term, commission);
+    }
+}

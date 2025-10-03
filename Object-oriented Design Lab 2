@@ -1,0 +1,222 @@
+Driver.java:
+-----------
+public class Driver {
+    public static void main(String[] args) {
+        CommissionCalculator calc = new CommissionCalculator();
+        calc.Run();
+    }
+}
+
+ CommissionCalculator.java:
+--------------------------
+import java.util.Scanner;
+
+class CommissionCalculator {
+    private Auto auto;
+    private Home home;
+    private Life life;
+    private Scanner input;
+
+    public CommissionCalculator() {
+        auto = new Auto();
+        home = new Home();
+        life = new Life();
+        input = new Scanner(System.in);
+    }
+
+    public void Run() {
+        int choice;
+        do {
+            printMenu();
+            choice = input.nextInt();
+            input.nextLine(); // 清除换行符
+
+            switch (choice) {
+                case 1:
+                    enterAuto();
+                    break;
+                case 2:
+                    enterHome();
+                    break;
+                case 3:
+                    enterLife();
+                    break;
+                case 4:
+                    auto.printPolicy();
+                    break;
+                case 5:
+                    home.printPolicy();
+                    break;
+                case 6:
+                    life.printPolicy();
+                    break;
+                case 7:
+                    System.out.println("Exiting program...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        } while (choice != 7);
+    }
+
+    private void printMenu() {
+        System.out.println("-------------------------------");
+        System.out.println("Welcome to Parkland Insurance");
+        System.out.println("-------------------------------");
+        System.out.println("Enter any of the following:");
+        System.out.println("1) Enter auto insurance policy information");
+        System.out.println("2) Enter home insurance policy information");
+        System.out.println("3) Enter life insurance policy information");
+        System.out.println("4) Compute commission and print auto policy");
+        System.out.println("5) Compute commission and print home policy");
+        System.out.println("6) Compute commission and print life policy");
+        System.out.println("7) Quit");
+    }
+
+    private void enterAuto() {
+        System.out.print("Enter first name of insured: ");
+        String firstName = input.nextLine();
+        System.out.print("Enter last name of insured: ");
+        String lastName = input.nextLine();
+        System.out.print("Enter make of vehicle: ");
+        String make = input.nextLine();
+        System.out.print("Enter model of vehicle: ");
+        String model = input.nextLine();
+        System.out.print("Enter amount of liability: ");
+        double liability = input.nextDouble();
+        System.out.print("Enter amount of collision: ");
+        double collision = input.nextDouble();
+        input.nextLine();
+        auto.setPolicy(firstName, lastName, make, model, liability, collision);
+    }
+
+    private void enterHome() {
+        System.out.print("Enter first name of insured: ");
+        String firstName = input.nextLine();
+        System.out.print("Enter last name of insured: ");
+        String lastName = input.nextLine();
+        System.out.print("Enter house square footage: ");
+        int footage = input.nextInt();
+        System.out.print("Enter amount of dwelling: ");
+        double dwelling = input.nextDouble();
+        System.out.print("Enter amount of contents: ");
+        double contents = input.nextDouble();
+        System.out.print("Enter amount of liability: ");
+        double liability = input.nextDouble();
+        input.nextLine();
+        home.setPolicy(firstName, lastName, footage, dwelling, contents, liability);
+    }
+
+    private void enterLife() {
+        System.out.print("Enter first name of insured: ");
+        String firstName = input.nextLine();
+        System.out.print("Enter last name of insured: ");
+        String lastName = input.nextLine();
+        System.out.print("Enter age of insured: ");
+        int age = input.nextInt();
+        System.out.print("Enter amount of term: ");
+        double term = input.nextDouble();
+        input.nextLine();
+        life.setPolicy(firstName, lastName, age, term);
+    }
+}
+
+Life.java:
+---------
+class Life {
+    private String firstName;
+    private String lastName;
+    private int age;
+    private double term;
+
+    public void setPolicy(String firstName, String lastName, int age, double term) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.term = term;
+    }
+
+    public double computeCommission() {
+        return term * 0.2;
+    }
+
+    public void printPolicy() {
+        System.out.println("Life Policy");
+        System.out.println("-----------");
+        System.out.println("Name: " + firstName + " " + lastName);
+        System.out.println("Age: " + age);
+        System.out.printf("Term: $%,.2f%n", term);
+        System.out.printf("Commission: $%,.2f%n", computeCommission());
+    }
+}
+
+ Home.java:
+----------
+class Home {
+    private String firstName;
+    private String lastName;
+    private int footage;
+    private double dwelling;
+    private double contents;
+    private double liability;
+
+    public void setPolicy(String firstName, String lastName, int footage, double dwelling, double contents, double liability) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.footage = footage;
+        this.dwelling = dwelling;
+        this.contents = contents;
+        this.liability = liability;
+    }
+
+    public double computeCommission() {
+        return (dwelling + contents + liability) * 0.2;
+    }
+
+    public void printPolicy() {
+        System.out.println("Home Policy");
+        System.out.println("-----------");
+        System.out.println("Name: " + firstName + " " + lastName);
+        System.out.println("Footage: " + footage);
+        System.out.printf("Dwelling: $%,.2f%n", dwelling);
+        System.out.printf("Contents: $%,.2f%n", contents);
+        System.out.printf("Liability: $%,.2f%n", liability);
+        System.out.printf("Commission: $%,.2f%n", computeCommission());
+    }
+}
+
+Auto.java:
+---------
+class Auto {
+    private String firstName;
+    private String lastName;
+    private String make;
+    private String model;
+    private double liability;
+    private double collision;
+
+    public void setPolicy(String firstName, String lastName, String make, String model, double liability, double collision) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.make = make;
+        this.model = model;
+        this.liability = liability;
+        this.collision = collision;
+    }
+
+    public double computeCommission() {
+        return (liability + collision) * 0.3;
+    }
+
+    public void printPolicy() {
+        System.out.println("Auto Policy");
+        System.out.println("-----------");
+        System.out.println("Name: " + firstName + " " + lastName);
+        System.out.println("Make: " + make);
+        System.out.println("Model: " + model);
+        System.out.printf("Liability: $%,.2f%n", liability);
+        System.out.printf("Collision: $%,.2f%n", collision);
+        System.out.printf("Commission: $%,.2f%n", computeCommission());
+    }
+}
+

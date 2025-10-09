@@ -1,0 +1,116 @@
+Main.java:
+---------
+public class Main {
+    public static void main(String[] args) {
+        // Create sample policy objects
+        Policy auto = new AutoPolicy("A123", "Alice", 10000, 25000);
+        Policy home = new HomePolicy("H456", "Bob", 20000, 300000);
+        Policy life = new LifePolicy("L789", "Carol", 15000, 20);
+
+        // Store in array
+        Policy[] policies = { auto, home, life };
+
+        // Compute and display commissions
+        for (Policy p : policies) {
+            System.out.println(p.getPolicyHolderName() + " Commission: $" + p.computeCommission());
+        }
+
+        // Compute total commission using CommissionCalculator
+        double total = CommissionCalculator.totalCommission(policies);
+        System.out.println("\nTotal Commission: $" + total);
+    }
+}
+
+Policy.java:
+-----------
+// Abstract base class
+public abstract class Policy {
+    protected String policyNumber;
+    protected String policyHolderName;
+    protected double policyAmount;
+
+    public Policy(String policyNumber, String policyHolderName, double policyAmount) {
+        this.policyNumber = policyNumber;
+        this.policyHolderName = policyHolderName;
+        this.policyAmount = policyAmount;
+    }
+
+    public String getPolicyNumber() {
+        return policyNumber;
+    }
+
+    public String getPolicyHolderName() {
+        return policyHolderName;
+    }
+
+    public double getPolicyAmount() {
+        return policyAmount;
+    }
+
+    // Abstract method to be implemented by derived classes
+    public abstract double computeCommission();
+}
+
+AutoPolicy.java:
+---------------
+public class AutoPolicy extends Policy {
+    private double carValue;
+
+    public AutoPolicy(String policyNumber, String policyHolderName, double policyAmount, double carValue) {
+        super(policyNumber, policyHolderName, policyAmount);
+        this.carValue = carValue;
+    }
+
+    @Override
+    public double computeCommission() {
+        // Suppose auto policies earn 5% of policy amount
+        return policyAmount * 0.05;
+    }
+}
+
+HomePolicy.java:
+---------------
+public class HomePolicy extends Policy {
+    private double homeValue;
+
+    public HomePolicy(String policyNumber, String policyHolderName, double policyAmount, double homeValue) {
+        super(policyNumber, policyHolderName, policyAmount);
+        this.homeValue = homeValue;
+    }
+
+    @Override
+    public double computeCommission() {
+        // Suppose home policies earn 4% commission
+        return policyAmount * 0.04;
+    }
+}
+
+LifePolicy.java:
+---------------
+public class LifePolicy extends Policy {
+    private int years;
+
+    public LifePolicy(String policyNumber, String policyHolderName, double policyAmount, int years) {
+        super(policyNumber, policyHolderName, policyAmount);
+        this.years = years;
+    }
+
+    @Override
+    public double computeCommission() {
+        // Suppose life policies earn 6% commission
+        return policyAmount * 0.06;
+    }
+}
+
+CommissionCalculator.java:
+-------------------------
+public class CommissionCalculator {
+    public static double totalCommission(Policy[] policies) {
+        double total = 0;
+        for (Policy p : policies) {
+            total += p.computeCommission();
+        }
+        return total;
+    }
+}
+

@@ -1,0 +1,159 @@
+CommissionCalculator.java:
+-------------------------
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class CommissionCalculator {
+
+    public static void main(String[] args) {
+
+        Scanner input = new Scanner(System.in);
+        ArrayList<Policy> policies = new ArrayList<>();
+
+        int choice;
+
+        System.out.println("Welcome to Parkland Insurance");
+        System.out.println("------------------------------");
+
+        do {
+            System.out.println("\nEnter any of the following:");
+            System.out.println("1) Enter auto insurance policy information");
+            System.out.println("2) Enter home insurance policy information");
+            System.out.println("3) Enter life insurance policy information");
+            System.out.println("4) Print all sales entered");
+            System.out.println("5) Quit");
+            System.out.print("Choice: ");
+            choice = input.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter policy number: ");
+                    int autoNum = input.nextInt();
+                    System.out.print("Enter policy amount: ");
+                    double autoAmt = input.nextDouble();
+                    System.out.print("Enter commission rate (%): ");
+                    double autoRate = input.nextDouble();
+                    policies.add(new AutoPolicy(autoNum, autoAmt, autoRate));
+                    break;
+
+                case 2:
+                    System.out.print("Enter policy number: ");
+                    int homeNum = input.nextInt();
+                    System.out.print("Enter policy amount: ");
+                    double homeAmt = input.nextDouble();
+                    System.out.print("Enter commission rate (%): ");
+                    double homeRate = input.nextDouble();
+                    policies.add(new HomePolicy(homeNum, homeAmt, homeRate));
+                    break;
+
+                case 3:
+                    System.out.print("Enter policy number: ");
+                    int lifeNum = input.nextInt();
+                    System.out.print("Enter policy amount: ");
+                    double lifeAmt = input.nextDouble();
+                    System.out.print("Enter commission rate (%): ");
+                    double lifeRate = input.nextDouble();
+                    policies.add(new LifePolicy(lifeNum, lifeAmt, lifeRate));
+                    break;
+
+                case 4:
+                    System.out.println("\n----- All Policy Sales -----");
+                    for (Policy policy : policies) {
+                        policy.computeCommission();
+                        System.out.println(policy);
+                    }
+                    break;
+
+                case 5:
+                    System.out.println("Exiting... Goodbye!");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+
+        } while (choice != 5);
+
+        input.close();
+    }
+}
+
+Policy.java:
+-----------
+public abstract class Policy {
+    protected int policyNumber;
+    protected double amount;
+    protected double commissionRate;
+    protected double commission;
+
+    public Policy(int policyNumber, double amount, double commissionRate) {
+        this.policyNumber = policyNumber;
+        this.amount = amount;
+        this.commissionRate = commissionRate;
+    }
+
+    public abstract void computeCommission();
+
+    public String toString() {
+        return String.format("Policy #%d | Amount: $%.2f | Rate: %.2f%% | Commission: $%.2f",
+                policyNumber, amount, commissionRate, commission);
+    }
+}
+
+AutoPolicy.java:
+---------------
+public class AutoPolicy extends Policy {
+
+    public AutoPolicy(int policyNumber, double amount, double commissionRate) {
+        super(policyNumber, amount, commissionRate);
+    }
+
+    @Override
+    public void computeCommission() {
+        commission = amount * (commissionRate / 100);
+    }
+
+    @Override
+    public String toString() {
+        return "Auto " + super.toString();
+    }
+}
+
+HomePolicy.java:
+---------------
+public class HomePolicy extends Policy {
+
+    public HomePolicy(int policyNumber, double amount, double commissionRate) {
+        super(policyNumber, amount, commissionRate);
+    }
+
+    @Override
+    public void computeCommission() {
+        commission = amount * (commissionRate / 100);
+    }
+
+    @Override
+    public String toString() {
+        return "Home " + super.toString();
+    }
+}
+
+LifePolicy.java:
+---------------
+public class LifePolicy extends Policy {
+
+    public LifePolicy(int policyNumber, double amount, double commissionRate) {
+        super(policyNumber, amount, commissionRate);
+    }
+
+    @Override
+    public void computeCommission() {
+        commission = amount * (commissionRate / 100);
+    }
+
+    @Override
+    public String toString() {
+        return "Life " + super.toString();
+    }
+}
+

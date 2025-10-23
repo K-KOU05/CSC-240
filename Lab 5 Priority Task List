@@ -1,0 +1,71 @@
+TaskList.java:
+-------------
+// TaskList.java
+import java.util.*;
+
+public class TaskList {
+    public static void main(String[] args) {
+        List<Task> tasks = new ArrayList<>();
+
+        // Add sample tasks
+        tasks.add(new Task("Attend class", 1));
+        tasks.add(new Task("Homework", 2));
+        tasks.add(new Task("Exercise", 3));
+        tasks.add(new Task("Eat breakfast", 4));
+        tasks.add(new Task("Eat lunch", 5));
+
+        // Sort by priority ascending
+        tasks.sort(Comparator.comparingInt(Task::getPriority));
+
+        System.out.println("Priority Task List");
+        System.out.println("------------------\n");
+
+        for (Task t : tasks) {
+            System.out.println(t);
+        }
+    }
+}
+
+Task.java:
+---------
+// Task.java
+public class Task implements Priority {
+    private String name;
+    private int priority;
+
+    public Task(String name, int priority) {
+        this.name = name;
+        setPriority(priority);
+    }
+
+    @Override
+    public void setPriority(int level) {
+        if (level < 1 || level > 5) {
+            throw new IllegalArgumentException("Priority must be between 1 and 5.");
+        }
+        this.priority = level;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%-15s priority: %d", name, priority);
+    }
+}
+
+Priority.java:
+-------------
+// Priority.java
+public interface Priority {
+    void setPriority(int level);   // 1 (highest) to 5 (lowest)
+    int getPriority();
+}
+

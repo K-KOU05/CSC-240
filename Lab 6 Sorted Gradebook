@@ -1,0 +1,107 @@
+Main.java:
+---------
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        Gradebook gradebook = new Gradebook(5);
+
+        for (int i = 0; i < 5; i++) {
+            System.out.print("Enter student <firstName> <lastName> <score>: ");
+            String first = input.next();
+            String last = input.next();
+            int score = input.nextInt();
+
+            gradebook.addStudent(new Student(first, last, score));
+        }
+
+        Student[] list = gradebook.getStudents();
+
+        // Sort students
+        Sorting.selectionSort(list);
+
+        System.out.println();
+        for (Student s : list) {
+            System.out.println(s);
+        }
+
+        input.close();
+    }
+}
+
+Student.java:
+------------
+public class Student implements Comparable<Student> {
+    private String firstName;
+    private String lastName;
+    private int score;
+
+    public Student(String firstName, String lastName, int score) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.score = score;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    @Override
+    public int compareTo(Student other) {
+        // Descending order
+        return other.score - this.score;
+    }
+
+    @Override
+    public String toString() {
+        return firstName + " " + lastName + " " + score;
+    }
+}
+
+Gradebook.java:
+--------------
+public class Gradebook {
+    private Student[] students;
+    private int count;
+
+    public Gradebook(int size) {
+        students = new Student[size];
+        count = 0;
+    }
+
+    public void addStudent(Student s) {
+        if (count < students.length) {
+            students[count] = s;
+            count++;
+        }
+    }
+
+    public Student[] getStudents() {
+        return students;
+    }
+}
+
+Sorting.java:
+------------
+public class Sorting {
+
+    public static void selectionSort(Student[] arr) {
+
+        for (int i = 0; i < arr.length - 1; i++) {
+            int maxIndex = i;
+
+            for (int j = i + 1; j < arr.length; j++) {
+                // descending compare
+                if (arr[j].compareTo(arr[maxIndex]) < 0) {
+                    maxIndex = j;
+                }
+            }
+
+            Student temp = arr[i];
+            arr[i] = arr[maxIndex];
+            arr[maxIndex] = temp;
+        }
+    }
+}
+

@@ -1,0 +1,260 @@
+MealSelector.java:
+-----------------
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Random;
+import java.util.Scanner;
+
+public class MealSelector {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        FoodList foods = new FoodList();
+
+        // Load file with basic error handling
+        while (foods.size() == 0) {
+            try {
+                System.out.print("Enter path to food data file (default: foods.txt): ");
+                String path = in.nextLine().trim();
+                if (path.isEmpty()) path = "foods.txt";
+                loadFromFile(path, foods);
+            } catch (FileNotFoundException e) {
+                System.out.println("Could not open file. Try again.");
+            }
+        }
+
+        boolean running = true;
+        while (running) {
+            System.out.println();
+            System.out.println("--------------------------------");
+            System.out.println("Welcome to Parkland Meal Selector");
+            System.out.println("--------------------------------");
+            System.out.println("Please select from the following");
+            System.out.println("1 - List food database");
+            System.out.println("2 - Create meal by manual selection");
+            System.out.println("3 - Create meal by random selection");
+            System.out.println("4 - Remove foods high in calorie");
+            System.out.println("5 - Exit");
+            System.out.print("> ");
+
+            switch (in.nextLine().trim()) {
+                case "1": printTable(foods); break;
+                case "2": manualMeal(in, foods); break;
+                case "3": randomMeal(foods); break;
+                case "4": removeHighCal(in, foods); break;
+                case "5": running = false; break;
+                default:  System.out.println("Invalid choice.");
+            }
+        }
+        in.close();
+        System.out.println("Goodbye!");
+    }
+
+    private static void loadFromFile(String path, FoodList foods) throws FileNotFoundException {
+        Scanner fileIn = new Scanner(new File(path));
+        int lineNo = 0;
+        while (fileIn.hasNextLine()) {
+            lineNo++;
+            String line = fileIn.nextLine().trim();
+            if (line.isEmpty()) continue;
+
+            Scanner row = new Scanner(line);
+            try {
+                String name = row.next();
+                String group = row.next();
+                int calories = Integer.parseInt(row.next());
+                double percent = Double.parseDouble(row.next());
+                foods.addLast(new FoodItem(name, group, calories, percent));
+            } catch (Exception ex) {
+                System.out.println("Skipping malformed line " + lineNo + ": " + line);
+            } finally {
+                row.close();
+            }
+        }
+        fileIn.close();
+        if (foods.size() == 0) throw new FileNotFoundException("No valid rows parsed.");
+    }
+
+    private static void printTable(FoodList foods) {
+        if (foods.size() == 0) { System.out.println("Food list is empty."); return; }
+        String sep = "=".repeat(70);
+        System.out.println();
+        System.out.println(sep);
+        System.out.printf("%-15s %-12s %-10s %-16s%n", "Name", "Food Group", "Calories", "Daily percentage");
+        System.out.println(sep);
+
+        for (FoodList.Node n = foods.head(); n != null; n = n.next) {
+            FoodItem f = n.data;
+            System.out.printf("%-15s %-12s %-10d %-16.2f%n",
+                    f.name(), f.group(), f.calories(), f.percent());
+        }
+    }
+
+    private static void manualMeal(Scanner in, FoodList foods) {
+        int picked = 0, totalCal = 0;
+        double totalPct = 0.0;
+        String names = "";
+
+        while (picked < 3) {
+            System.out.print("Enter food name: ");
+            String name = in.nextLine().trim();
+            FoodItem fi = foods.findByName(name);
+            if (fi == null) {
+                System.out.println("Food " + name + " not in database, try again");
+                continue;
+            }
+            if (containsName(names, fi.name())) {
+                System.out.println("Already selected, choose a different item.");
+                continue;
+            }
+            names = names.isEmpty() ? fi.name() : names + " " + fi.name();
+            totalCal += fi.calories();
+            totalPct += fi.percent();
+            picked++;
+        }
+
+        System.out.println("\n===============================");
+        System.out.println("Your selected meal");
+        System.out.println("Foods: " + names);
+        System.out.println("Total calorie count: " + totalCal);
+        System.out.println("Total daily percentage: " + Math.round(totalPct * 100) + "%");
+        System.out.println("===============================");
+    }
+
+    private static void randomMeal(FoodList foods) {
+        Random rng = new Random();
+        FoodItem a = foods.get(rng.nextInt(foods.size()));
+        FoodItem b = foods.get(rng.nextInt(foods.size()));
+        while (b.name().equalsIgnoreCase(a.name()))
+            b = foods.get(rng.nextInt(foods.size()));
+        FoodItem c = foods.get(rng.nextInt(foods.size()));
+        while (c.name().equalsIgnoreCase(a.name()) || c.name().equalsIgnoreCase(b.name()))
+            c = foods.get(rng.nextInt(foods.size()));
+
+        int totalCal = a.calories() + b.calories() + c.calories();
+        double totalPct = a.percent() + b.percent() + c.percent();
+
+        System.out.println("\n===============================");
+        System.out.println("Your selected meal");
+        System.out.println("Foods: " + a.name() + " " + b.name() + " " + c.name());
+        System.out.println("Total calorie count: " + totalCal);
+        System.out.println("Total daily percentage: " + Math.round(totalPct * 100) + "%");
+        System.out.println("===============================");
+    }
+
+    private static void removeHighCal(Scanner in, FoodList foods) {
+        System.out.print("Enter calorie limit: ");
+        String s = in.nextLine().trim();
+        int limit;
+        try {
+            limit = Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            System.out.println("Not a number.");
+            return;
+        }
+        int removed = foods.removeIfCaloriesGreaterThan(limit);
+        System.out.println("Removed " + removed + " item(s) with calories > " + limit + ".");
+    }
+
+    private static boolean containsName(String names, String target) {
+        if (names.isEmpty()) return false;
+        Scanner s = new Scanner(names);
+        while (s.hasNext()) {
+            if (s.next().equalsIgnoreCase(target)) { s.close(); return true; }
+        }
+        s.close();
+        return false;
+    }
+}
+
+FoodList.java:
+-------------
+public class FoodList {
+    public static class Node {
+        public final FoodItem data;
+        public Node next;
+        public Node(FoodItem d) { this.data = d; }
+    }
+
+    private Node head;
+    private Node tail;
+    private int size;
+
+    public int size() { return size; }
+    public Node head() { return head; }
+
+    public void addLast(FoodItem item) {
+        Node n = new Node(item);
+        if (head == null) {
+            head = tail = n;
+        } else {
+            tail.next = n;
+            tail = n;
+        }
+        size++;
+    }
+
+    public FoodItem get(int index) {
+        if (index < 0 || index >= size) return null;
+        Node cur = head;
+        for (int i = 0; i < index; i++) cur = cur.next;
+        return cur.data;
+    }
+
+    public FoodItem findByName(String name) {
+        Node cur = head;
+        while (cur != null) {
+            if (cur.data.name().equalsIgnoreCase(name)) return cur.data;
+            cur = cur.next;
+        }
+        return null;
+    }
+
+    public int removeIfCaloriesGreaterThan(int limit) {
+        int removed = 0;
+
+        while (head != null && head.data.calories() > limit) {
+            head = head.next;
+            size--;
+            removed++;
+        }
+        if (head == null) { tail = null; return removed; }
+
+        Node prev = head;
+        Node cur = head.next;
+        while (cur != null) {
+            if (cur.data.calories() > limit) {
+                prev.next = cur.next;
+                if (cur == tail) tail = prev;
+                size--;
+                removed++;
+                cur = prev.next;
+            } else {
+                prev = cur;
+                cur = cur.next;
+            }
+        }
+        return removed;
+    }
+}
+
+FoodItem.java:
+-------------
+public class FoodItem {
+    private final String name;
+    private final String group;
+    private final int calories;
+    private final double percent;
+
+    public FoodItem(String name, String group, int calories, double percent) {
+        this.name = name;
+        this.group = group;
+        this.calories = calories;
+        this.percent = percent;
+    }
+
+    public String name() { return name; }
+    public String group() { return group; }
+    public int calories() { return calories; }
+    public double percent() { return percent; }
+}
+
